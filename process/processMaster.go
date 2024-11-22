@@ -94,9 +94,11 @@ func loadPurchaseHistory(filepath string) *[]purchase {
 
 }
 
-func CreateProcessMaster(dataFolderPath string, homebaseZipCode string) *ProcessMaster {
+func CreateProcessMaster(dataFolderPath string, chainCount int, homebaseZipCode string) *ProcessMaster {
 
-	if dataFolderPath[len(dataFolderPath)-1] != '/' {
+	dataFolderPath = strings.TrimSpace(dataFolderPath)
+
+	if dataFolderPath == "" && dataFolderPath[len(dataFolderPath)-1] != '/' {
 
 		dataFolderPath += "/"
 
@@ -115,7 +117,6 @@ func CreateProcessMaster(dataFolderPath string, homebaseZipCode string) *Process
 	//   - There are 1_000_000 product ids and we decided to break it into 40 subparts since
 	//     it works outevenly
 	//
-	const CHAIN_COUNT int = 40
 	const PROCESS_COUNT int = 3
 
 	processMaster := new(ProcessMaster)
@@ -170,11 +171,11 @@ func CreateProcessMaster(dataFolderPath string, homebaseZipCode string) *Process
 	// Determine the numnber of product ids each node will process. This will be used to tell
 	// the nodes what section of the slice it is responsible for.
 	//
-	subsliceCount := (len(*productIds) / CHAIN_COUNT)
+	subsliceCount := (len(*productIds) / chainCount)
 
 	// Prep the nodes
 	//
-	processMaster.chainCount = CHAIN_COUNT
+	processMaster.chainCount = chainCount
 	processMaster.processCount = PROCESS_COUNT
 	processMaster.nodeCount = processMaster.chainCount * processMaster.processCount
 	processMaster.productIds = productIds
@@ -235,7 +236,6 @@ func CreateProcessMaster(dataFolderPath string, homebaseZipCode string) *Process
 
 	// Wire the grid
 	//
-
 	fmt.Print("Configuring the process chains... ")
 
 	start = time.Now()
