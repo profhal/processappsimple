@@ -1,6 +1,8 @@
 package process
 
-import "processappsimple/utilities"
+import (
+	"processappsimple/utilities"
+)
 
 type customerZip struct {
 	customerId string

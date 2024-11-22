@@ -21,9 +21,9 @@ func main() {
 	const CHAIN_COUNT = 40
 
 	const PSNK_ZIP = "15068"
-	const SEATTLE_ZIP = "98109"
+	const SEATTLE_ZIP = "04667"
 
-	homeZip := SEATTLE_ZIP
+	homeZip := PSNK_ZIP
 
 	processMaster := process.CreateProcessMaster(DATA_FOLDER_PATH, CHAIN_COUNT, homeZip)
 

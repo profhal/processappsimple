@@ -313,7 +313,7 @@ func (pm *ProcessMaster) FindFarthestZipInMiles() (farthestZip string, farthestD
 
 		msg := <-pm.inputQ
 
-		fmt.Println("Chains heard from:", msg.senderId)
+		fmt.Println("  > Heard from chain:", msg.senderId)
 
 	}
 
