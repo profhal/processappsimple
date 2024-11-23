@@ -11,303 +11,266 @@ using namespace std;
 
 const string CHARACTER_BANK = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
+string *generateProductIds(int idCount, int idLength,
+                           bool showProgress = false) {
 
-string* generateProductIds(int idCount, int idLength, bool showProgress = false) {
+  BinaryTree idTree;
 
-    BinaryTree idTree;
+  string *result = new string[idCount];
+  int resultCount = 0;
 
-    string* result = new string[idCount];
-    int resultCount = 0;
+  string candidate;
 
-    string candidate;
+  bool stillTrying;
 
-    bool stillTrying;
+  for (int p = 0; p < idCount; ++p) {
 
+    if (showProgress && p % (idCount / 10) == 0) {
 
-    for (int p=0; p < idCount; ++p) {
-
-        if (showProgress && p % (idCount/10) == 0) {
-
-            cout << ".";
-            cout.flush();
-
-        }
-
-        stillTrying = true;
-
-        while (stillTrying) {
-
-            candidate = "";
-            
-            // Starts with a letter
-            //
-            candidate += CHARACTER_BANK[rand() % 26];
-
-            for (int c=1; c < idLength; ++c) {
-
-                candidate += CHARACTER_BANK[rand() % CHARACTER_BANK.length()];
-
-            }
-            
-            if (!idTree.has(candidate)) {
-
-                stillTrying = false;
-
-            }
-    
-        }
-
-        idTree.insert(candidate);
-
+      cout << ".";
+      cout.flush();
     }
 
-    return idTree.getAscendingArray();
+    stillTrying = true;
 
+    while (stillTrying) {
+
+      candidate = "";
+
+      // Starts with a letter
+      //
+      candidate += CHARACTER_BANK[rand() % 26];
+
+      for (int c = 1; c < idLength; ++c) {
+
+        candidate += CHARACTER_BANK[rand() % CHARACTER_BANK.length()];
+      }
+
+      if (!idTree.has(candidate)) {
+
+        stillTrying = false;
+      }
+    }
+
+    idTree.insert(candidate);
+  }
+
+  return idTree.getAscendingArray();
 }
 
+string *generateCustomerIds(int idCount, int idLength,
+                            bool showProgress = false) {
 
-string* generateCustomerIds(int idCount, int idLength, bool showProgress = false) {
-    
-    // Product and customer ids look the same.
-    //
-    return generateProductIds(idCount, idLength, showProgress);
-
+  // Product and customer ids look the same.
+  //
+  return generateProductIds(idCount, idLength, showProgress);
 }
-
-
 
 const string ZIPCODE_FILE = "zipCodes.txt";
 
-string* loadZipCodes(int &totalZips) {
+string *loadZipCodes(int &totalZips) {
 
-    const int ZIP_STEP = 10000;
-    string* zips = new string[ZIP_STEP];
+  const int ZIP_STEP = 10000;
+  string *zips = new string[ZIP_STEP];
 
-    ifstream zipCodeFile;
+  ifstream zipCodeFile;
 
-    zipCodeFile.open(ZIPCODE_FILE);
+  zipCodeFile.open(ZIPCODE_FILE);
 
-    string token;
+  string token;
 
-    totalZips = 0;
+  totalZips = 0;
 
-    while (zipCodeFile >> token) {
+  while (zipCodeFile >> token) {
 
-        zipCodeFile >> zips[totalZips++];
+    zipCodeFile >> zips[totalZips++];
 
-        getline(zipCodeFile, token);
+    getline(zipCodeFile, token);
 
-        if (totalZips % ZIP_STEP == 0) {
+    if (totalZips % ZIP_STEP == 0) {
 
-            string* temp = new string[totalZips + ZIP_STEP];
+      string *temp = new string[totalZips + ZIP_STEP];
 
-            for (int z=0; z < totalZips; ++z) {
-                temp[z] = zips[z];
-            }
+      for (int z = 0; z < totalZips; ++z) {
+        temp[z] = zips[z];
+      }
 
-            delete [] zips;
+      delete[] zips;
 
-            zips = temp;
-
-        }
-
+      zips = temp;
     }
+  }
 
-    return zips;
-
+  return zips;
 }
-
-
 
 int main() {
 
-    const int PRODUCT_COUNT = 1000000;
-    const int PRODUCT_ID_LENGTH = 5;
+  const int PRODUCT_COUNT = 100;
+  const int PRODUCT_ID_LENGTH = 5;
 
-    const int CUSTOMER_COUNT = 1000000;
-    const int CUSTOMER_ID_LENGTH = 6;
+  const int CUSTOMER_COUNT = 100; // made smaller constants for testing
+  const int CUSTOMER_ID_LENGTH = 6;
 
-    const int PURCHASES_PER_CUSTOMER_MIN = 24;
-    const int PURCHASES_PER_CUSTOMER_MAX = 72;
+  const int PURCHASES_PER_CUSTOMER_MIN = 24;
+  const int PURCHASES_PER_CUSTOMER_MAX = 72;
 
-    const string FILEPATH_TO_DATA_FOLDER = "/Volumes/Data Disk/Process App Data/Test/";
-    const string PRODUCT_ID_FILENAME = "productIds";
-    const string CUSTOMER_ID_WITH_ZIP_FILENAME = "customerIdsWithZips";
-    const string PURCHASE_HISTORY_FILENAME = "purchaseHistory";
+  const string FILEPATH_TO_DATA_FOLDER = "../db/init_data/";
+  const string PRODUCT_ID_FILENAME = "productIds";
+  const string CUSTOMER_ID_WITH_ZIP_FILENAME = "customerIdsWithZips";
+  const string PURCHASE_HISTORY_FILENAME = "purchaseHistory";
 
-    const string DATA_FILE_EXTESION = ".txt";
+  const string DATA_FILE_EXTESION = ".txt";
 
-    ofstream productIdFile;
-    ofstream customerIdWithZipFile;
-    ofstream purchaseHistoryFile;
+  ofstream productIdFile;
+  ofstream customerIdWithZipFile;
+  ofstream purchaseHistoryFile;
 
-    chrono::system_clock::time_point start;
-    chrono::system_clock::time_point stop;
-    chrono::duration<double> elapsedTime;
+  chrono::system_clock::time_point start;
+  chrono::system_clock::time_point stop;
+  chrono::duration<double> elapsedTime;
 
-    int purchaseCount;
+  int purchaseCount;
 
-    string* zipBank;
-    int zipBankCount = 0; 
-    string* productIds;
-    string* customerIds;
+  string *zipBank;
+  int zipBankCount = 0;
+  string *productIds;
+  string *customerIds;
 
+  srand(time(0));
 
-    srand(time(0));
+  zipBank = loadZipCodes(zipBankCount);
 
+  cout << "Generating product ids ";
+  cout.flush();
 
-    zipBank = loadZipCodes(zipBankCount);
+  start = chrono::system_clock::now();
 
+  productIds = generateProductIds(PRODUCT_COUNT, PRODUCT_ID_LENGTH, true);
 
-    cout << "Generating product ids ";
-    cout.flush();
+  stop = chrono::system_clock::now();
 
-    start = chrono::system_clock::now();
+  elapsedTime = chrono::duration_cast<chrono::seconds>(stop - start);
 
-    productIds = generateProductIds(PRODUCT_COUNT, PRODUCT_ID_LENGTH, true);
+  cout << "Done: " << elapsedTime.count() << "s." << endl;
 
-    stop = chrono::system_clock::now();
+  cout << "Generating customer ids ";
+  cout.flush();
 
-    elapsedTime = chrono::duration_cast<chrono::seconds>(stop - start);
+  start = chrono::system_clock::now();
 
-    cout << "Done: " << elapsedTime.count() << "s." << endl;
+  customerIds = generateProductIds(CUSTOMER_COUNT, CUSTOMER_ID_LENGTH, true);
 
+  stop = chrono::system_clock::now();
 
+  elapsedTime = chrono::duration_cast<chrono::seconds>(stop - start);
 
-    cout << "Generating customer ids ";
-    cout.flush();
+  cout << "Done: " << elapsedTime.count() << "s." << endl;
 
-    start = chrono::system_clock::now();
+  productIdFile.open(FILEPATH_TO_DATA_FOLDER + PRODUCT_ID_FILENAME +
+                     DATA_FILE_EXTESION);
 
-    customerIds = generateProductIds(CUSTOMER_COUNT, CUSTOMER_ID_LENGTH, true);
+  cout << "Writing product ids... ";
+  cout.flush();
 
-    stop = chrono::system_clock::now();
+  start = chrono::system_clock::now();
 
-    elapsedTime = chrono::duration_cast<chrono::seconds>(stop - start);
+  for (int p = 0; p < PRODUCT_COUNT; ++p) {
 
-    cout << "Done: " << elapsedTime.count() << "s." << endl;
+    productIdFile << productIds[p];
 
+    if (p < PRODUCT_COUNT - 1) {
 
+      productIdFile << endl;
+    }
+  }
 
-    productIdFile.open(FILEPATH_TO_DATA_FOLDER + PRODUCT_ID_FILENAME + DATA_FILE_EXTESION);
+  stop = chrono::system_clock::now();
 
-    cout << "Writing product ids... ";
-    cout.flush();
+  elapsedTime = chrono::duration_cast<chrono::seconds>(stop - start);
 
-    start = chrono::system_clock::now();
+  cout << "Done: " << elapsedTime.count() << "s." << endl;
 
-    for (int p=0; p < PRODUCT_COUNT; ++p) {
+  productIdFile.close();
 
-        productIdFile << productIds[p];
+  cout << "Generating customer id files ";
+  cout.flush();
 
-        if (p < PRODUCT_COUNT - 1) {
+  customerIdWithZipFile.open(FILEPATH_TO_DATA_FOLDER +
+                             CUSTOMER_ID_WITH_ZIP_FILENAME +
+                             DATA_FILE_EXTESION);
 
-            productIdFile << endl;
+  start = chrono::system_clock::now();
 
-        }
+  for (int c = 0; c < CUSTOMER_COUNT; ++c) {
 
+    if (c % (CUSTOMER_COUNT / 10) == 0) {
+
+      cout << ".";
+      cout.flush();
     }
 
-    stop = chrono::system_clock::now();
+    customerIdWithZipFile << customerIds[c] << ","
+                          << zipBank[rand() % zipBankCount];
 
-    elapsedTime = chrono::duration_cast<chrono::seconds>(stop - start);
+    if (c < CUSTOMER_COUNT - 1) {
 
-    cout << "Done: " << elapsedTime.count() << "s." << endl;
+      customerIdWithZipFile << endl;
+    }
+  }
 
-    productIdFile.close();
+  stop = chrono::system_clock::now();
 
+  elapsedTime = chrono::duration_cast<chrono::seconds>(stop - start);
 
+  cout << "Done: " << elapsedTime.count() << "s." << endl;
 
-    cout << "Generating customer id files ";
-    cout.flush();
+  customerIdWithZipFile.close();
 
-    customerIdWithZipFile.open(FILEPATH_TO_DATA_FOLDER 
-                               + CUSTOMER_ID_WITH_ZIP_FILENAME
-                               + DATA_FILE_EXTESION);
+  delete[] zipBank;
 
+  cout << "Generating purchase history files ";
+  cout.flush();
 
-    start = chrono::system_clock::now();
+  purchaseHistoryFile.open(FILEPATH_TO_DATA_FOLDER + PURCHASE_HISTORY_FILENAME +
+                           DATA_FILE_EXTESION);
 
-    for (int c=0; c < CUSTOMER_COUNT; ++c) {
+  start = chrono::system_clock::now();
 
-        if (c % (CUSTOMER_COUNT/10) == 0) {
+  for (int c = 0; c < CUSTOMER_COUNT; ++c) {
 
-            cout << ".";
-            cout.flush();
+    if (c % (CUSTOMER_COUNT / 10) == 0) {
 
-        }
-
-        customerIdWithZipFile << customerIds[c] << " " << zipBank[rand() % zipBankCount];
-
-        if (c < CUSTOMER_COUNT - 1) {
-
-            customerIdWithZipFile << endl;
-
-        }
-
-
+      cout << ".";
+      cout.flush();
     }
 
-    stop = chrono::system_clock::now();
+    purchaseCount = (rand() % (PURCHASES_PER_CUSTOMER_MAX + 1 -
+                               PURCHASES_PER_CUSTOMER_MIN) +
+                     PURCHASES_PER_CUSTOMER_MIN);
 
-    elapsedTime = chrono::duration_cast<chrono::seconds>(stop - start);
+    for (int p = 0; p < purchaseCount; ++p) {
 
-    cout << "Done: " << elapsedTime.count() << "s." << endl;
+      purchaseHistoryFile << customerIds[c] << ","
+                          << productIds[rand() % PRODUCT_COUNT];
 
-    customerIdWithZipFile.close();
+      if (p < purchaseCount - 1) {
 
-    delete [] zipBank;
-
-
-
-    cout << "Generating purchase history files ";
-    cout.flush();
-
-    purchaseHistoryFile.open(FILEPATH_TO_DATA_FOLDER 
-                                + PURCHASE_HISTORY_FILENAME 
-                                + DATA_FILE_EXTESION);
-
-    start = chrono::system_clock::now();
-
-    for (int c = 0; c < CUSTOMER_COUNT; ++c) {
-
-        if (c % (CUSTOMER_COUNT/10) == 0) {
-
-            cout << ".";
-            cout.flush();
-
-        }
-
-        purchaseCount = (rand() % (PURCHASES_PER_CUSTOMER_MAX + 1 - PURCHASES_PER_CUSTOMER_MIN) 
-                        + PURCHASES_PER_CUSTOMER_MIN);
-
-        for (int p=0; p < purchaseCount; ++p) {
-
-            purchaseHistoryFile << customerIds[c] 
-                                << " " << productIds[rand() % PRODUCT_COUNT];
-
-
-            if (p < purchaseCount - 1) {
-
-                purchaseHistoryFile << endl;
-
-            }
-
-        }
-
+        purchaseHistoryFile << endl;
+      }
     }
+  }
 
-    stop = chrono::system_clock::now();
+  stop = chrono::system_clock::now();
 
-    elapsedTime = chrono::duration_cast<chrono::seconds>(stop - start);
+  elapsedTime = chrono::duration_cast<chrono::seconds>(stop - start);
 
-    cout << "Done: " << elapsedTime.count() << "s." << endl;
+  cout << "Done: " << elapsedTime.count() << "s." << endl;
 
-    purchaseHistoryFile.close();
+  purchaseHistoryFile.close();
 
-    delete [] productIds;
-    delete [] customerIds;
+  delete[] productIds;
+  delete[] customerIds;
 
-    return 0;
-
+  return 0;
 }
