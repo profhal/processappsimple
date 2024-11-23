@@ -1,1 +1,10 @@
-app/customerIdsWithZips.txt
+# Ignore all
+*
+# Unignore all with extensions
+!*.*
+# Unignore all dirs
+!*/
+*swp
+productIds.txt
+purchaseHistory.txt
+customerIdsWithZips.txt
