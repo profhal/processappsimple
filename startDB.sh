@@ -11,10 +11,12 @@ echo "Generate Data Files.... this may take some time...."
 cd ../
 
 echo "Temporary Data Cleanup Step to handle purchase records with 3 fields"
+mkdir -p db/init_data
 cd db/init_data
-grep -v '^.*,.*,.*$' purchaseHistory.txt > temp
+grep -v '^.* .* .*$' purchaseHistory.txt > temp
 mv temp purchaseHistory.txt
 cd ../../
+
 
 
 echo "Clearing out any existing DB data files"

@@ -11,7 +11,8 @@ CREATE TABLE customers (
 
 LOAD DATA INFILE '/docker-entrypoint-initdb.d/init_data/customerIdsWithZips.txt' 
 INTO TABLE customers
-FIELDS TERMINATED BY ','
+FIELDS TERMINATED BY ' '
+(customerid, zipcode)
 ;
 
 CREATE TABLE products (
@@ -28,5 +29,5 @@ CREATE TABLE purchase_history (
 );
 LOAD DATA INFILE '/docker-entrypoint-initdb.d/init_data/purchaseHistory.txt' 
 INTO TABLE purchase_history
-FIELDS TERMINATED BY ','
+FIELDS TERMINATED BY ' '
 (customerid, productid);
