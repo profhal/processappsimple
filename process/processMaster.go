@@ -10,6 +10,15 @@ import (
 	"time"
 )
 
+// The process master manages a collection of process nodes orgranized into chainCount
+// chains of processCount processes.
+//
+// The purpose of the process master is to compute the zip code of the farthest location
+// from the home base zip code to which a product shipped.
+//
+// Each process chain works on a subset of the productIds slice by determining the zip
+// code of the farthest shippment containined in the subslice. The process master
+// determines the overall farthest zip code.
 type ProcessMaster struct {
 	Master
 	chainCount      int
@@ -23,6 +32,8 @@ type ProcessMaster struct {
 	inputQ          chan message
 }
 
+// Returns a pointer to a stice containing all the product ids found in
+// the specified file.
 func loadProductIds(filepath string) *[]string {
 
 	productIds := make([]string, 0)
@@ -45,6 +56,8 @@ func loadProductIds(filepath string) *[]string {
 
 }
 
+// Returns a pointer to a stice containing all the customer-zip code
+// pairs in the specified file.
 func loadCustomerIdsAndZips(filepath string) *[]customerZip {
 
 	customerZips := make([]customerZip, 0)
@@ -69,6 +82,9 @@ func loadCustomerIdsAndZips(filepath string) *[]customerZip {
 
 }
 
+// Returns a pointer to a slice containing all the purchse histories
+// (a pair of customerId and productId indicating the customer bought)
+// the product) found in the specified file.
 func loadPurchaseHistory(filepath string) *[]purchase {
 
 	purchaseHistory := make([]purchase, 0)
@@ -94,11 +110,16 @@ func loadPurchaseHistory(filepath string) *[]purchase {
 
 }
 
+// Returns a pointer to a process master that establishes chainCount process chains (i.e. each chain gets
+// 1/chainCount portion of the problem) and will be capable of computing the farthest distance from the
+// specified home base.
+//
+// The data files required by the process master are expected to be in the folder dataFolderPath.
 func CreateProcessMaster(dataFolderPath string, chainCount int, homebaseZipCode string) *ProcessMaster {
 
 	dataFolderPath = strings.TrimSpace(dataFolderPath)
 
-	if dataFolderPath == "" && dataFolderPath[len(dataFolderPath)-1] != '/' {
+	if dataFolderPath != "" && dataFolderPath[len(dataFolderPath)-1] != '/' {
 
 		dataFolderPath += "/"
 
@@ -108,17 +129,24 @@ func CreateProcessMaster(dataFolderPath string, chainCount int, homebaseZipCode 
 	CUSTOMER_IDS_WITH_ZIPS_FILEPATH := dataFolderPath + "customerIdsWithZips.txt"
 	PURCHASE_HISTORY_FILEPATH := dataFolderPath + "purchaseHistory.txt"
 
-	// Make more dynamic later
+	// There are three stages to the data transformation:
 	//
-	// These values are derived as follows:
-	//   - The rows represent the steps in the process. This requires knowing how the gridNode
-	//     works. Would like to loosen this.
+	// process node message: "find customer"
+	//    takes a set of product ids and finds all customer ids of customers who
+	//    purchased the products
 	//
-	//   - There are 1_000_000 product ids and we decided to break it into 40 subparts since
-	//     it works outevenly
+	// process node message: "find zipcodes"
+	//    takes sets of customer ids and determines all the zip codes in which
+	//    they live
+	//
+	// process node message: "find farthest"
+	//    takes sets of zip codes and determines which is the farthes from the
+	//    home base zip code
 	//
 	const PROCESS_COUNT int = 3
 
+	// Create the process master.
+	//
 	processMaster := new(ProcessMaster)
 
 	// Establish the input and output slices shared between master and nodes and nodes and nodes.
@@ -184,7 +212,7 @@ func CreateProcessMaster(dataFolderPath string, chainCount int, homebaseZipCode 
 
 	// Create the zip code utility
 	//
-	processMaster.zipCodeUtil = utilities.CreateZipCodeUtil("../support/zipCodes.txt")
+	processMaster.zipCodeUtil, _ = utilities.GetZipCodeUtilInstance()
 
 	// There are 40 chains reporting back so set the buffer to 40.
 	//
@@ -204,7 +232,6 @@ func CreateProcessMaster(dataFolderPath string, chainCount int, homebaseZipCode 
 
 			processMaster.nodes[c] = append(processMaster.nodes[c], new(processNode))
 
-			// node[r][c] is in position (c, r) in the grid.
 			processMaster.nodes[c][p].id = "(" + strconv.Itoa(c) + ", " + strconv.Itoa(p) + ")"
 
 			processMaster.nodes[c][p].chainId = strconv.Itoa(c)
@@ -290,7 +317,8 @@ func CreateProcessMaster(dataFolderPath string, chainCount int, homebaseZipCode 
 
 }
 
-// Executes the process over the chains.
+// Executes the process over the chains and returns the zip code and distance to which the farthest
+// shipment was made.
 func (pm *ProcessMaster) FindFarthestZipInMiles() (farthestZip string, farthestDistance float64) {
 
 	messageCount := pm.chainCount

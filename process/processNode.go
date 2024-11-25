@@ -14,6 +14,22 @@ type purchase struct {
 	productId  string
 }
 
+// A process node participates in a chain of processing. A node can be at any position in the chain as its
+// behvior is determined by the messages it receiveds in inputQ.
+//
+// If a node has a non-nil nextProcess, it will complete its job and send a nextProcessMsg to nextProcess.
+//
+// The following messages are handled by a process node, noting that each process chain works on a subset of each
+// slice (from startIndex to endIndex, inclusive on both ends):
+//
+// message: "find customers"
+//   - uses productIds and purchaseHistory to create sets of customer ids (what customers bought what products)
+//
+// message: "find zips"
+//   - uses sets of customer ids to create sets of zip codes (the customers live where)
+//
+// message: "find farthest"
+//   - uses sets of zip codes to determine the farthest zip code of the subset (the process chain's answer)
 type processNode struct {
 	id                  string
 	chainId             string
@@ -32,10 +48,13 @@ type processNode struct {
 	inputQ              chan message
 }
 
+// Places a message in the process node's input queue
 func (n *processNode) acceptMessage(msg message) {
 	n.inputQ <- msg
 }
 
+// Initiates the proces node's processing algorithm (a goroutine). The node will not process messages
+// until this function is called.
 func (n *processNode) start(master Master, finishedMsgContent string) {
 
 	go func() {

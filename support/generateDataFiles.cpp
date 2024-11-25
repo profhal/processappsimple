@@ -76,7 +76,7 @@ string* generateCustomerIds(int idCount, int idLength, bool showProgress = false
 
 
 
-const string ZIPCODE_FILE = "zipCodes.txt";
+const string ZIPCODE_FILE = "../data/zipCodes.txt";
 
 string* loadZipCodes(int &totalZips) {
 
@@ -284,14 +284,8 @@ int main() {
         for (int p=0; p < purchaseCount; ++p) {
 
             purchaseHistoryFile << customerIds[c] 
-                                << " " << productIds[rand() % PRODUCT_COUNT];
-
-
-            if (p < purchaseCount - 1) {
-
-                purchaseHistoryFile << endl;
-
-            }
+                                << " " << productIds[rand() % PRODUCT_COUNT]
+                                << endl;
 
         }
 

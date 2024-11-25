@@ -1,1 +1,4 @@
-app/customerIdsWithZips.txt
+data/customerIdsWithZips.txt
+data/productIds.txt
+data/purchaseHistory.txt
+__pycache__/*

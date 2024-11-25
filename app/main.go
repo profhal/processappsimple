@@ -3,13 +3,14 @@ package main
 import (
 	"fmt"
 	"processappsimple/process"
+	"processappsimple/utilities"
 )
 
 func main() {
 
 	// The path the folder with the data files.
 	//
-	const DATA_FOLDER_PATH = "/Volumes/Data Disk/Process App Data/Test/"
+	const DATA_FOLDER_PATH = "../data/"
 
 	// This is the number of process chains. It should divide the number of product ids evenly
 	// or there might be some uncertain behavior.
@@ -20,15 +21,33 @@ func main() {
 	//
 	const CHAIN_COUNT = 40
 
-	const PSNK_ZIP = "15068"
-	const SEATTLE_ZIP = "04667"
+	// The home base zip code that is used to determine the farthest zip an item
+	// was shipped to.
+	//
+	// Examples: PSNK : 15068
+	//           Belle Fourche, SD : 57717 (most centered post office of all 50 US states)
+	//           Honolulu, HI: 96898
+	//           Seattle, WA : 98109
+	//			 San Diego, CA: 92108
+	//
+	homeZip := "15068"
 
-	homeZip := PSNK_ZIP
+	zipCodeUtil, _ := utilities.GetZipCodeUtilInstance()
 
 	processMaster := process.CreateProcessMaster(DATA_FOLDER_PATH, CHAIN_COUNT, homeZip)
 
 	zipCode, distance := processMaster.FindFarthestZipInMiles()
 
-	fmt.Println("Zip code", zipCode, "is the farthest at", distance, "miles away from", homeZip)
+	farthestCityState, _ := zipCodeUtil.GetCityState(zipCode)
+	homeBaseCityState, _ := zipCodeUtil.GetCityState(homeZip)
+
+	fmt.Println("Zip code",
+		zipCode,
+		"("+farthestCityState+")",
+		"is the farthest at",
+		distance,
+		"miles away from",
+		homeZip,
+		"("+homeBaseCityState+")")
 
 }
