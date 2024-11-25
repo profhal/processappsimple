@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"processappsimple/process"
 	"processappsimple/utilities"
 )
@@ -26,11 +27,20 @@ func main() {
 	//
 	// Examples: PSNK : 15068
 	//           Belle Fourche, SD : 57717 (most centered post office of all 50 US states)
+	//           Lebanon, KY : 40033 (most centered post office of the contiguous 48 states)
 	//           Honolulu, HI: 96898
 	//           Seattle, WA : 98109
 	//			 San Diego, CA: 92108
 	//
-	homeZip := "15068"
+	homeZip := "40033"
+
+	args := os.Args
+
+	if len(args) > 1 {
+
+		homeZip = args[1]
+
+	}
 
 	zipCodeUtil, _ := utilities.GetZipCodeUtilInstance()
 

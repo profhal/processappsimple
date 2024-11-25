@@ -2,9 +2,11 @@ PRODUCT_ID_LENGTH = 5
 CUSTOMER_ID_LENGTH = 6
 ZIP_LENGTH = 5
 
+data_file_folder_path = "../data/"
+
 print("Validating purchase history file. Problems found: ")
 
-purchaseFile = open("/Volumes/Data Disk/Process App Data/Test/purchaseHistory.txt")
+purchaseFile = open(data_file_folder_path + "purchaseHistory.txt")
 
 lineCount = 0
 
@@ -30,7 +32,7 @@ purchaseFile.close()
 
 print("Validating product id file. Problems found: ")
 
-productFile = open("/Volumes/Data Disk/Process App Data/Test/productIds.txt")
+productFile = open(data_file_folder_path + "productIds.txt")
 
 lineCount = 0
 
@@ -55,7 +57,7 @@ productFile.close()
 
 print("Validating customer/zip file. Problems found: ")
 
-customerZipFile = open("/Volumes/Data Disk/Process App Data/Test/customerIdsWithZips.txt")
+customerZipFile = open(data_file_folder_path + "customerIdsWithZips.txt")
 
 lineCount = 0
 

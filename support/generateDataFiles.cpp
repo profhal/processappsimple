@@ -76,7 +76,8 @@ string* generateCustomerIds(int idCount, int idLength, bool showProgress = false
 
 
 
-const string ZIPCODE_FILE = "../data/zipCodes.txt";
+//const string ZIPCODE_FILE = "../data/zipCodes.txt";  // Includes HI and AK
+const string ZIPCODE_FILE = "../data/zipCodesContiguous.txt";
 
 string* loadZipCodes(int &totalZips) {
 
