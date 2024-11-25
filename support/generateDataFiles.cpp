@@ -130,7 +130,7 @@ int main() {
     const int PURCHASES_PER_CUSTOMER_MIN = 24;
     const int PURCHASES_PER_CUSTOMER_MAX = 72;
 
-    const string FILEPATH_TO_DATA_FOLDER = "/Volumes/Data Disk/Process App Data/Test/";
+    const string FILEPATH_TO_DATA_FOLDER = "../data/";
     const string PRODUCT_ID_FILENAME = "productIds";
     const string CUSTOMER_ID_WITH_ZIP_FILENAME = "customerIdsWithZips";
     const string PURCHASE_HISTORY_FILENAME = "purchaseHistory";
